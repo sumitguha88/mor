@@ -143,13 +143,17 @@ If there is no real semantic ambiguity, a lighter solution is usually better.
 
 ## Explorer
 
-<p align="right">
-  <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" width="48%" />
-</p>
-
-The ontology explorer renders the runtime graph as an interactive knowledge graph with concept inspection and MCP visibility.
-
-The screenshot above shows MOR rendering the `paint` ontology as a navigable concept graph, with the selected node exposing its definition, aliases, relationships, inferred relationships, and source file.
+<table>
+  <tr>
+    <td valign="top" width="52%">
+      <p>The ontology explorer renders the runtime graph as an interactive knowledge graph with concept inspection and MCP visibility.</p>
+      <p>The screenshot shows MOR rendering the <code>paint</code> ontology as a navigable concept graph, with the selected node exposing its definition, aliases, relationships, inferred relationships, and source file.</p>
+    </td>
+    <td valign="top" align="right" width="48%">
+      <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" width="100%" />
+    </td>
+  </tr>
+</table>
 
 ## How It Works
 
@@ -490,9 +494,17 @@ mor benchmark
 
 ### MCP Server
 
-<p align="right">
-  <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" width="48%" />
-</p>
+<table>
+  <tr>
+    <td valign="top" width="52%">
+      <p>MOR exposes an MCP-style surface over the ontology runtime, including resources, tools, and prompts that agents can use to resolve terms, expand queries, inspect concepts, and scaffold answers.</p>
+      <p>The MCP explorer view lets developers inspect the published surface and try the ontology operations interactively from the UI.</p>
+    </td>
+    <td valign="top" align="right" width="48%">
+      <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" width="100%" />
+    </td>
+  </tr>
+</table>
 
 Resources:
 
