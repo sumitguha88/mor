@@ -8,7 +8,7 @@
       <p>Instead of hoping the model interprets domain language correctly every time, MOR lets you define the domain explicitly in versioned markdown, validate it, and use it at runtime for resolution, expansion, scaffolding, explainability, MCP publishing, and evaluation.</p>
     </td>
     <td valign="top" align="right" width="48%">
-      <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" />
+      <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" />
     </td>
   </tr>
 </table>
@@ -147,8 +147,6 @@ If there is no real semantic ambiguity, a lighter solution is usually better.
 ## Explorer
 
 The ontology explorer renders the runtime graph as an interactive knowledge graph with concept inspection and MCP visibility.
-
-![MOR Ontology Explorer](docs/images/ontology-explorer.png)
 
 The screenshot above shows MOR rendering the `paint` ontology as a navigable concept graph, with the selected node exposing its definition, aliases, relationships, inferred relationships, and source file.
 
