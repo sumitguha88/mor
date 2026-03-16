@@ -1,0 +1,19 @@
+[
+  {
+    "name": "resolve paid search channel",
+    "query": "paid search budget allocation",
+    "intent": "architecture_explanation",
+    "expected_concepts": ["search-advertising", "campaign-management"],
+    "expected_sections": ["definition", "mechanism", "tradeoffs", "comparison"],
+    "expected_terms": ["search advertising", "campaign management", "audience segmentation", "attribution model"]
+  },
+  {
+    "name": "expand campaign measurement query",
+    "query": "how do we measure campaign conversion performance",
+    "intent": "architecture_explanation",
+    "expected_concepts": ["campaign-measurement", "attribution-model", "conversion-funnel"],
+    "expected_sections": ["definition", "mechanism", "tradeoffs", "comparison"],
+    "expected_terms": ["campaign measurement", "attribution model", "conversion funnel", "lead qualification"]
+  }
+]
+

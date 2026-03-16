@@ -1,0 +1,11 @@
+{
+  "id": "paint-manufacturing",
+  "name": "Paint Manufacturing",
+  "description": "Ontology for plant, line, product, material, supplier, warehousing, depot, and retail flows in paint manufacturing.",
+  "domain": "manufacturing",
+  "version": "V3",
+  "structure": "markdown-concept-v2",
+  "default": false,
+  "is_default_version": false,
+  "tags": ["paint", "manufacturing", "supply-chain", "warehousing", "distribution"]
+}

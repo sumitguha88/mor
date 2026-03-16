@@ -1,0 +1,61 @@
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "markdown-ontology-runtime"
+version = "0.1.0"
+description = "Markdown Ontology Runtime (MOR): a markdown-authored ontology layer for AI agents and RAG systems."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [
+  { name = "Open Source Contributors" },
+]
+keywords = ["ontology", "markdown", "rag", "agents", "semantic-layer", "mcp"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Developers",
+  "License :: OSI Approved :: MIT License",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Framework :: FastAPI",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Text Processing :: Markup :: Markdown",
+]
+dependencies = [
+  "fastapi>=0.115.0,<1.0.0",
+  "pydantic>=2.9.0,<3.0.0",
+  "typer>=0.16.0,<1.0.0",
+  "uvicorn>=0.32.0,<1.0.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "httpx>=0.28.0,<1.0.0",
+  "pytest>=8.3.0,<9.0.0",
+]
+ui = [
+  "streamlit>=1.43.0,<2.0.0",
+]
+eval = [
+  "openai>=1.109.0,<2.0.0",
+  "langfuse>=3.14.0,<4.0.0; python_version < '3.14'",
+]
+
+[project.scripts]
+mor = "mor.cli:app"
+mor-explorer = "mor.explorer:main"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/mor"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[tool.ruff]
+line-length = 100

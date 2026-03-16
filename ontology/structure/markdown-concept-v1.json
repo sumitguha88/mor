@@ -1,0 +1,64 @@
+{
+  "id": "markdown-concept-v1",
+  "name": "Markdown Concept Format V1",
+  "description": "Default MOR markdown structure for concept files with typed relationships.",
+  "concept_header_prefix": "# Concept:",
+  "required_sections": [
+    "Canonical",
+    "Aliases",
+    "Definition",
+    "Related",
+    "NotSameAs",
+    "QueryHints",
+    "AnswerRequirements"
+  ],
+  "optional_sections": [
+    "Parents"
+  ],
+  "list_sections": [
+    "Aliases",
+    "Related",
+    "NotSameAs",
+    "QueryHints",
+    "AnswerRequirements",
+    "Parents"
+  ],
+  "text_sections": [
+    "Canonical",
+    "Definition"
+  ],
+  "canonical_section": "Canonical",
+  "aliases_section": "Aliases",
+  "definition_section": "Definition",
+  "relationship_section": "Related",
+  "parents_section": "Parents",
+  "not_same_as_section": "NotSameAs",
+  "query_hints_section": "QueryHints",
+  "answer_requirements_section": "AnswerRequirements",
+  "relationship_type_keys": [
+    "type",
+    "relationship",
+    "predicate"
+  ],
+  "relationship_target_keys": [
+    "concept",
+    "entity",
+    "target"
+  ],
+  "inverse_relationships": {
+    "supplies": "supplied_by",
+    "supplied_by": "supplies",
+    "ships_to": "receives_from",
+    "receives_from": "ships_to",
+    "contains": "contained_in",
+    "contained_in": "contains",
+    "manufactures": "manufactured_on",
+    "manufactured_on": "manufactures",
+    "stores": "stored_in",
+    "stored_in": "stores",
+    "produces": "produced_by",
+    "produced_by": "produces",
+    "has_production_line": "part_of",
+    "has_warehouse": "part_of"
+  }
+}

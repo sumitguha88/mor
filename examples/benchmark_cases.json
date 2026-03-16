@@ -1,0 +1,18 @@
+[
+  {
+    "name": "resolve grind stage to pigment dispersion",
+    "query": "grind stage for solvent-borne paint",
+    "intent": "architecture_explanation",
+    "expected_concepts": ["pigment-dispersion", "milling"],
+    "expected_sections": ["definition", "mechanism", "tradeoffs", "comparison"],
+    "expected_terms": ["pigment dispersion", "milling", "resin binder", "solvent system"]
+  },
+  {
+    "name": "expand paint viscosity control query",
+    "query": "how do we control viscosity in decorative paint production",
+    "intent": "architecture_explanation",
+    "expected_concepts": ["paint-manufacturing", "viscosity-control", "quality-control"],
+    "expected_sections": ["definition", "mechanism", "tradeoffs", "comparison"],
+    "expected_terms": ["paint manufacturing", "viscosity control", "quality control", "batch ticket"]
+  }
+]

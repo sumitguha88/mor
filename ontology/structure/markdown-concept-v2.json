@@ -1,0 +1,85 @@
+{
+  "id": "markdown-concept-v2",
+  "name": "Markdown Concept Format V2",
+  "description": "Extended MOR markdown structure with richer concept metadata, examples, and constraints.",
+  "concept_header_prefix": "# Concept:",
+  "required_sections": [
+    "Canonical",
+    "Type",
+    "Aliases",
+    "Definition",
+    "Related",
+    "QueryHints",
+    "AnswerRequirements"
+  ],
+  "optional_sections": [
+    "Parents",
+    "Attributes",
+    "ExampleQueries",
+    "Tags",
+    "Synonyms",
+    "Notes",
+    "Constraints",
+    "NotSameAs"
+  ],
+  "list_sections": [
+    "Aliases",
+    "Related",
+    "NotSameAs",
+    "QueryHints",
+    "AnswerRequirements",
+    "Parents",
+    "Attributes",
+    "ExampleQueries",
+    "Tags",
+    "Synonyms",
+    "Constraints"
+  ],
+  "text_sections": [
+    "Canonical",
+    "Type",
+    "Definition",
+    "Notes"
+  ],
+  "canonical_section": "Canonical",
+  "type_section": "Type",
+  "aliases_section": "Aliases",
+  "definition_section": "Definition",
+  "relationship_section": "Related",
+  "parents_section": "Parents",
+  "not_same_as_section": "NotSameAs",
+  "query_hints_section": "QueryHints",
+  "answer_requirements_section": "AnswerRequirements",
+  "attributes_section": "Attributes",
+  "example_queries_section": "ExampleQueries",
+  "tags_section": "Tags",
+  "synonyms_section": "Synonyms",
+  "notes_section": "Notes",
+  "constraints_section": "Constraints",
+  "relationship_type_keys": [
+    "type",
+    "relationship",
+    "predicate"
+  ],
+  "relationship_target_keys": [
+    "concept",
+    "entity",
+    "target"
+  ],
+  "inverse_relationships": {
+    "supplies": "supplied_by",
+    "supplied_by": "supplies",
+    "ships_to": "receives_from",
+    "receives_from": "ships_to",
+    "contains": "contained_in",
+    "contained_in": "contains",
+    "manufactures": "manufactured_on",
+    "manufactured_on": "manufactures",
+    "stores": "stored_in",
+    "stored_in": "stores",
+    "produces": "produced_by",
+    "produced_by": "produces",
+    "has_production_line": "part_of",
+    "has_warehouse": "part_of"
+  }
+}
