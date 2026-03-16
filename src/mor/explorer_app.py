@@ -9,6 +9,7 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
+from mor.constants import MCP_SERVER_INFO, MCP_SERVER_INSTRUCTIONS, SCAFFOLD_INTENTS
 from mor.registry import list_ontology_areas
 from mor.runtime import OntologyRuntime
 from mor.utils import json_dumps
@@ -46,6 +47,108 @@ def _load_runtime_snapshot(
         "stats": runtime.stats().model_dump(mode="json"),
         "concepts": [concept.model_dump(mode="json") for concept in runtime.model.concepts.values()],
         "graph": graph.model_dump(mode="json"),
+    }
+
+
+@st.cache_data(show_spinner=False)
+def _load_mcp_surface(root: str, area: str | None, version: str | None) -> dict[str, object]:
+    runtime = OntologyRuntime(root, area=area, version=version)
+    bundle_id = runtime.bundle_id() or "current"
+    concepts = runtime.list_concepts()
+    resources = [
+        {
+            "uri": "ontology://index",
+            "name": "Ontology Index",
+            "description": "Top-level entry point for the selected ontology bundle.",
+        },
+        {
+            "uri": f"ontology://bundle/{bundle_id}",
+            "name": "Ontology Bundle",
+            "description": "Bundle metadata, structure information, and concept summary for the selected area/version.",
+        },
+        *[
+            {
+                "uri": f"ontology://concept/{concept.id}",
+                "name": concept.canonical,
+                "description": f"Concept resource for {concept.canonical}.",
+            }
+            for concept in concepts
+        ],
+    ]
+    tools = [
+        {
+            "name": "resolve_term",
+            "description": "Resolve user terminology to a canonical ontology concept.",
+            "inputSchema": {"type": "object", "properties": {"term": {"type": "string"}}, "required": ["term"]},
+        },
+        {
+            "name": "expand_query",
+            "description": "Expand a natural language query using ontology concepts and relationships.",
+            "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]},
+        },
+        {
+            "name": "validate_ontology",
+            "description": "Run validation for the selected ontology bundle.",
+            "inputSchema": {"type": "object", "properties": {}},
+        },
+        {
+            "name": "build_answer_scaffold",
+            "description": "Create an ontology-guided answer scaffold for an intent and query.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "intent": {"type": "string"},
+                    "query": {"type": "string"},
+                },
+                "required": ["intent"],
+            },
+        },
+        {
+            "name": "get_concept",
+            "description": "Return the resolved ontology concept payload for an id or term.",
+            "inputSchema": {"type": "object", "properties": {"concept": {"type": "string"}}, "required": ["concept"]},
+        },
+        {
+            "name": "get_related_concepts",
+            "description": "Return outgoing and incoming links for a concept.",
+            "inputSchema": {
+                "type": "object",
+                "properties": {
+                    "concept": {"type": "string"},
+                    "relationship_type": {"type": "string"},
+                },
+                "required": ["concept"],
+            },
+        },
+        {
+            "name": "explain_query_resolution",
+            "description": "Show how the runtime interpreted a query and which concepts were matched.",
+            "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]},
+        },
+        {
+            "name": "compute_query_coverage",
+            "description": "Estimate how well the ontology covers a natural language query.",
+            "inputSchema": {"type": "object", "properties": {"query": {"type": "string"}}, "required": ["query"]},
+        },
+    ]
+    prompts = [
+        {
+            "name": "ontology_guided_answer",
+            "description": "Use MOR resolution, expansion, related concepts, and scaffold output before generating the final answer.",
+            "arguments": [{"name": "query", "required": True}],
+        },
+        {
+            "name": "concept_comparison",
+            "description": "Compare two ontology concepts using canonical definitions, distinctions, and relationships.",
+            "arguments": [{"name": "concept_a", "required": True}, {"name": "concept_b", "required": True}],
+        },
+    ]
+    return {
+        "server_info": MCP_SERVER_INFO,
+        "instructions": MCP_SERVER_INSTRUCTIONS,
+        "resources": resources,
+        "tools": tools,
+        "prompts": prompts,
     }
 
 
@@ -90,6 +193,8 @@ def run() -> None:
             include_parents,
             include_not_same_as,
         )
+    mcp_surface = _load_mcp_surface(ontology_root, area_id, version)
+    runtime = OntologyRuntime(ontology_root, area=area_id, version=version)
 
     concepts = sorted(snapshot["concepts"], key=lambda item: item["canonical"])
     selection = snapshot["selection"] or {}
@@ -107,7 +212,7 @@ def run() -> None:
     metric_columns[3].metric("Hierarchy Edges", stats["hierarchy_edge_count"])
     metric_columns[4].metric("Validation Issues", stats["validation_errors"] + stats["validation_warnings"])
 
-    graph_tab, concepts_tab, data_tab = st.tabs(["Graph", "Concepts", "Graph Data"])
+    graph_tab, concepts_tab, data_tab, mcp_tab = st.tabs(["Graph", "Concepts", "Graph Data", "MCP"])
     with graph_tab:
         with st.spinner("Rendering graph..."):
             components.html(
@@ -129,6 +234,9 @@ def run() -> None:
 
     with data_tab:
         st.code(json_dumps(snapshot["graph"]), language="json")
+
+    with mcp_tab:
+        _render_mcp_tab(runtime, mcp_surface)
 
 
 def _graph_html(
@@ -647,6 +755,167 @@ def _render_relationship_section(title: str, relationships: list[dict[str, objec
             st.markdown(f"- `{relationship_type}` -> {target}{suffix}")
     else:
         st.caption("None")
+
+
+def _render_mcp_tab(runtime: OntologyRuntime, surface: dict[str, object]) -> None:
+    resources = surface["resources"]
+    tools = surface["tools"]
+    prompts = surface["prompts"]
+    server_info = surface["server_info"]
+
+    st.markdown("#### MCP Surface")
+    st.caption(
+        "This tab presents the MCP-style surface exposed by the current ontology runtime, "
+        "including resources, tools, prompts, and a playground to try them interactively."
+    )
+    info_columns = st.columns(4)
+    info_columns[0].metric("Server", server_info.get("name", "mor"))
+    info_columns[1].metric("Version", server_info.get("version", "unknown"))
+    info_columns[2].metric("Resources", len(resources))
+    info_columns[3].metric("Tools", len(tools))
+
+    st.markdown("**Usage Guidance**")
+    st.write(surface["instructions"])
+
+    resource_col, tool_col = st.columns(2)
+    with resource_col:
+        st.markdown("**Resources**")
+        for resource in resources[:12]:
+            with st.container(border=True):
+                st.markdown(f"`{resource['uri']}`")
+                st.write(resource["name"])
+                st.caption(resource["description"])
+        if len(resources) > 12:
+            st.caption(f"{len(resources) - 12} more concept resources available in this ontology.")
+
+    with tool_col:
+        st.markdown("**Tools**")
+        for tool in tools:
+            with st.container(border=True):
+                st.markdown(f"`{tool['name']}`")
+                st.write(tool["description"])
+                st.code(json_dumps(tool["inputSchema"]), language="json")
+
+    st.markdown("**Prompts**")
+    for prompt in prompts:
+        with st.container(border=True):
+            st.markdown(f"`{prompt['name']}`")
+            st.write(prompt["description"])
+            st.code(json_dumps(prompt.get("arguments", [])), language="json")
+
+    st.markdown("#### Try It")
+    mode = st.radio("Mode", ["Tool Playground", "Resource Viewer"], horizontal=True)
+    if mode == "Tool Playground":
+        _render_mcp_tool_playground(runtime, tools)
+    else:
+        _render_mcp_resource_viewer(runtime)
+
+
+def _render_mcp_tool_playground(runtime: OntologyRuntime, tools: list[dict[str, object]]) -> None:
+    tool_names = [tool["name"] for tool in tools]
+    selected_tool = st.selectbox("Tool", tool_names, key="mcp_tool_name")
+
+    with st.form("mcp_tool_form"):
+        term = st.text_input("Term", value="water-based paint")
+        query = st.text_area(
+            "Query",
+            value="Which raw materials most strongly affect drying time in water-based exterior primers?",
+            height=96,
+        )
+        concept = st.text_input("Concept", value="paint product")
+        relationship_type = st.text_input("Relationship Type", value="")
+        intent = st.selectbox("Intent", list(SCAFFOLD_INTENTS), index=0)
+        include_inferred = st.checkbox("Include inferred relationships", value=True)
+        include_incoming = st.checkbox("Include incoming relationships", value=True)
+        submitted = st.form_submit_button("Run")
+
+    if not submitted:
+        return
+
+    result = _invoke_mcp_tool(
+        runtime,
+        selected_tool,
+        term=term,
+        query=query,
+        concept=concept,
+        relationship_type=relationship_type or None,
+        intent=intent,
+        include_inferred=include_inferred,
+        include_incoming=include_incoming,
+    )
+    st.code(json_dumps(result), language="json")
+
+
+def _render_mcp_resource_viewer(runtime: OntologyRuntime) -> None:
+    concept_options = [concept.id for concept in runtime.list_concepts()]
+    resource_mode = st.selectbox(
+        "Resource",
+        ["ontology://index", f"ontology://bundle/{runtime.bundle_id()}", "ontology://concept/{id}"],
+        key="mcp_resource_mode",
+    )
+    if resource_mode == "ontology://index":
+        data = {
+            "metadata": runtime.metadata().model_dump(mode="json"),
+            "bundles": [bundle.model_dump(mode="json") for bundle in runtime.list_bundles()],
+        }
+        st.code(json_dumps(data), language="json")
+        return
+    if resource_mode.startswith("ontology://bundle/"):
+        bundle = runtime.get_bundle(runtime.bundle_id() or "")
+        st.code(json_dumps(bundle.model_dump(mode="json") if bundle else {}), language="json")
+        return
+
+    concept_id = st.selectbox("Concept Resource", concept_options, key="mcp_resource_concept")
+    concept = runtime.get_concept(concept_id)
+    source = runtime.concept_source(concept_id)
+    data = {
+        "concept": concept.model_dump(mode="json") if concept else None,
+        "source": source,
+    }
+    st.code(json_dumps(data), language="json")
+
+
+def _invoke_mcp_tool(
+    runtime: OntologyRuntime,
+    tool_name: str,
+    *,
+    term: str,
+    query: str,
+    concept: str,
+    relationship_type: str | None,
+    intent: str,
+    include_inferred: bool,
+    include_incoming: bool,
+) -> dict[str, object]:
+    if tool_name == "resolve_term":
+        return runtime.resolve(term).model_dump(mode="json")
+    if tool_name == "expand_query":
+        return runtime.expand(query).model_dump(mode="json")
+    if tool_name == "validate_ontology":
+        return runtime.validate().model_dump(mode="json")
+    if tool_name == "build_answer_scaffold":
+        return runtime.scaffold(intent=intent, query=query).model_dump(mode="json")
+    if tool_name == "get_concept":
+        concept_obj = runtime.get_concept_by_term(concept)
+        return concept_obj.model_dump(mode="json") if concept_obj else {"error": "Concept not found."}
+    if tool_name == "get_related_concepts":
+        return {
+            "concept": concept,
+            "links": [
+                link.model_dump(mode="json")
+                for link in runtime.get_related_concepts(
+                    concept,
+                    relationship_type=relationship_type,
+                    include_inferred=include_inferred,
+                    include_incoming=include_incoming,
+                )
+            ],
+        }
+    if tool_name == "explain_query_resolution":
+        return runtime.explain_query_resolution(query).model_dump(mode="json")
+    if tool_name == "compute_query_coverage":
+        return runtime.compute_query_coverage(query).model_dump(mode="json")
+    return {"error": f"Unsupported tool '{tool_name}'."}
 
 
 def _node_title(properties: dict[str, object]) -> str:
