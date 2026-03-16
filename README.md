@@ -7,9 +7,6 @@
       <p>It gives AI agents and RAG systems a semantic layer between raw user language and model prompts, retrieval, and tool execution.</p>
       <p>Instead of hoping the model interprets domain language correctly every time, MOR lets you define the domain explicitly in versioned markdown, validate it, and use it at runtime for resolution, expansion, scaffolding, explainability, MCP publishing, and evaluation.</p>
     </td>
-    <td valign="top" align="right" width="48%">
-      <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" />
-    </td>
   </tr>
 </table>
 
@@ -145,6 +142,10 @@ If there is no real semantic ambiguity, a lighter solution is usually better.
 - Evaluation harness and Langfuse integration
 
 ## Explorer
+
+<p align="right">
+  <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" width="48%" />
+</p>
 
 The ontology explorer renders the runtime graph as an interactive knowledge graph with concept inspection and MCP visibility.
 
@@ -488,6 +489,10 @@ mor benchmark
 - `GET /stats`
 
 ### MCP Server
+
+<p align="right">
+  <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" width="48%" />
+</p>
 
 Resources:
 
