@@ -1,381 +1,39 @@
-# Markdown Ontology Runtime
+# Markdown Ontology Runtime (MOR)
 
-<table>
-  <tr>
-    <td valign="top">
-      <p><strong>MOR</strong> is an open-source ontology runtime for LLM applications.</p>
-      <p>It gives AI agents and RAG systems a semantic layer between raw user language and model prompts, retrieval, and tool execution.</p>
-      <p>Instead of hoping the model interprets domain language correctly every time, MOR lets you define the domain explicitly in versioned markdown, validate it, and use it at runtime for resolution, expansion, scaffolding, explainability, MCP publishing, and evaluation.</p>
-    </td>
-  </tr>
-</table>
+**Git-native ontology runtime for LLMs, agents, and RAG systems.**
 
-## Why MOR
+MOR adds a semantic layer between raw user language and your prompts, retrieval pipeline, tool execution, answer scaffolding, MCP publishing, and evaluation.  
+Instead of asking the model to infer domain meaning from text alone, MOR lets you define concepts, aliases, relationships, and answer structure explicitly in versioned markdown.
 
-LLMs are strong at language generation, but weak at maintaining stable domain semantics over time.
+> Badges to add: `CI` · `License` · `Docs` · `Package`
 
-They do not naturally guarantee:
+## Try MOR in 2 Minutes
 
-- consistent terminology
-- explicit concept boundaries
-- reliable synonym handling
-- typed domain relationships
-- predictable answer structure
-- explainable reasoning traces
-
-That gap becomes visible as soon as you build systems for real business domains:
-
-- enterprise knowledge assistants
-- agentic workflows
-- domain-specific copilots
-- search and retrieval over messy internal language
-- operational reasoning over plants, products, suppliers, formulas, policies, contracts, incidents, and processes
-
-MOR solves that by making your domain model first-class.
-
-## Why Ontology Improves LLM Systems
-
-An ontology works better than prompt-only or embedding-only approaches when the problem is semantic precision, not just text similarity.
-
-### 1. Canonical meaning beats surface wording
-
-Users ask for the same thing in many ways.
-
-`async consistency`, `eventual state convergence`, and `eventual consistency` should not be treated as unrelated strings. MOR maps them to a canonical concept and uses that concept consistently across the runtime.
-
-### 2. Typed relationships improve reasoning
-
-Embeddings can tell you that two things are similar. They do not tell you whether one:
-
-- contains another
-- is supplied by another
-- defines another
-- is part of another
-- should not be confused with another
-
-MOR captures those relationships explicitly, which makes query expansion, answer scaffolding, and explainability much more reliable.
-
-### 3. Controlled expansion is safer than blind expansion
-
-A pure semantic search system often expands a query with terms that are merely nearby in vector space. That is often too loose for enterprise use.
-
-MOR expands queries through governed domain relationships:
-
-- `product -> defined_by -> formula`
-- `formula -> contains -> raw material`
-- `supplier -> supplies -> raw material`
-
-That produces expansion that is interpretable, reviewable, and version-controlled.
-
-### 4. Structured answers reduce drift
-
-When an ontology defines answer requirements, the model has a better chance of producing answers that are complete and aligned with the domain:
-
-- definition
-- mechanism
-- tradeoffs
-- comparison
-- constraints
-
-This is especially useful for agent responses, operational explainers, and domain Q&A systems.
-
-### 5. Explainability becomes possible
-
-MOR can show:
-
-- which concept matched a user term
-- which relationships expanded the query
-- which scaffold shaped the answer
-
-That is much easier to inspect and debug than opaque prompt chains.
-
-## When You Should Use MOR
-
-MOR is a strong fit when:
-
-- your domain has lots of synonyms, abbreviations, or overloaded terms
-- the business uses internal language that public models do not know well
-- you need stable terminology across prompts, retrieval, and answers
-- you want explainable query expansion
-- you need versioned semantic governance in Git
-- your agent or RAG system must reason over entities and relationships, not just documents
-- your prompts need structured answer requirements
-- you want to expose the ontology to tools, APIs, or MCP clients
-
-Typical domains:
-
-- manufacturing
-- supply chain
-- healthcare operations
-- finance and risk
-- legal and compliance
-- internal enterprise architecture
-- support and service workflows
-
-## When You Probably Should Not Use MOR
-
-Do not add ontology for its own sake.
-
-MOR is probably unnecessary if:
-
-- your use case is a simple FAQ bot
-- the domain language is already clean and unambiguous
-- document retrieval alone is sufficient
-- you do not need explainability or semantic governance
-- your team will not maintain the ontology over time
-
-If there is no real semantic ambiguity, a lighter solution is usually better.
-
-## What MOR Gives You
-
-- Markdown-native ontology authoring in Git
-- Configurable ontology structures by version
-- Strict parsing and validation
-- Canonical term resolution
-- Typed relationship graphs
-- Query expansion using governed concept links
-- Answer scaffold generation
-- FastAPI service layer
-- CLI workflows
-- MCP server support
-- Streamlit ontology explorer
-- Evaluation harness and Langfuse integration
-
-## Explorer
-
-<table>
-  <tr>
-    <td valign="top" width="52%">
-      <p>The ontology explorer renders the runtime graph as an interactive knowledge graph with concept inspection and MCP visibility.</p>
-      <p>The screenshot shows MOR rendering the <code>paint</code> ontology as a navigable concept graph, with the selected node exposing its definition, aliases, relationships, inferred relationships, and source file.</p>
-    </td>
-    <td valign="top" align="right" width="48%">
-      <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" width="100%" />
-    </td>
-  </tr>
-</table>
-
-## How It Works
-
-```text
-Markdown concept files
-        ↓
-Structure-aware parser
-        ↓
-Semantic runtime model
-        ↓
-Validator
-        ↓
-Runtime services
-        ↓
-CLI / API / MCP / Explorer / Eval
-```
-
-Each ontology area is versioned, and each version points to its own structure definition.
-
-```text
-ontology/
-  structure/
-    markdown-concept-v1.json
-    markdown-concept-v2.json
-  paint/
-    V1/
-      ontology.json
-      *.md
-```
-
-That means you can evolve authoring standards without breaking the entire repository layout.
-
-## Example: Why This Matters
-
-### Better Example: Multi-hop Manufacturing Query
-
-Suppose a user asks:
-
-> Which raw materials most strongly affect drying time in water-based exterior primers?
-
-This is much harder than the previous kind of query.
-
-The answer requires understanding multiple domain relationships.
-
-### 1. What a Vanilla RAG System Sees
-
-A retriever finds documents mentioning:
-
-- drying time
-- primer
-- water based paint
-- additives
-- resins
-
-The LLM must infer relationships like:
-
-- `drying time <- performance attribute`
-- `performance attribute <- influenced by formulation`
-- `formulation <- raw materials`
-
-But none of these relationships are explicit.
-
-So the LLM guesses.
-
-Typical answer:
-
-> Drying time in water-based primers is influenced by resins, solvents, and additives.
-
-This answer is generic and shallow.
-
-### 2. What MOR Makes Explicit
-
-The ontology contains structured domain knowledge.
-
-Concept hierarchy:
-
-```text
-Paint Product
-  └── Primer
-        └── Exterior Primer
-```
-
-Material relationships:
-
-```text
-Paint Product
-   defined_by → Paint Formula
-
-Paint Formula
-   contains → Raw Material
-```
-
-Material types:
-
-```text
-Raw Material
-   ├── Resin
-   ├── Pigment
-   ├── Solvent
-   └── Additive
-```
-
-Performance attributes:
-
-```text
-Performance Attribute
-   ├── Viscosity
-   ├── Dry Time
-   └── Durability
-```
-
-Functional relationships:
-
-- `Resin` affects film formation
-- `Solvent` affects evaporation rate
-- `Additive` affects drying behavior
-
-### 3. How the MOR MCP Workflow Happens
-
-Step 1: Resolve query terms
-
-Tool:
-
-- `resolve_term`
-
-Input:
-
-- `drying time`
-- `water-based`
-- `exterior primer`
-- `raw materials`
-
-Output:
-
-- `Dry Time -> Performance Attribute`
-- `Water-Based Paint -> Paint Type`
-- `Exterior Primer -> Paint Product`
-- `Raw Material -> Ingredient Class`
-
-Now the system understands the domain entities.
-
-Step 2: Expand the query
-
-Tool:
-
-- `expand_query`
-
-Expansion uses ontology relationships:
-
-- `Dry Time` influenced by:
-- `Resin`
-- `Solvent`
-- `Additive`
-
-Now the semantic query becomes:
-
-> Which resin, solvent, or additive components in water-based exterior primers influence dry time?
-
-This is far more precise than the original query.
-
-Step 3: Traverse relationships
-
-Tool:
-
-- `get_related_concepts`
-
-Example results:
-
-- `Dry Time influenced_by -> Solvent`
-- `Dry Time influenced_by -> Additive`
-- `Film Formation influenced_by -> Resin`
-
-This reveals mechanistic relationships.
-
-Step 4: Compute coverage
-
-Tool:
-
-- `compute_query_coverage`
-
-Output:
-
-- `covered_concepts`
-- `Exterior Primer`
-- `Dry Time`
-- `Raw Material`
-- `expanded_concepts`
-- `Solvent`
-- `Resin`
-- `Additive`
-
-The model knows the ontology can support the query.
-
-### 4. Final Ontology-Guided Answer
-
-Now the LLM answers using structured knowledge.
-
-Example answer:
-
-Drying time in water-based exterior primers is primarily influenced by three classes of raw materials:
-
-`Resins (Binders)`
-  Acrylic resins form the paint film and influence how quickly the coating sets after application.
-
-`Solvents (Water and co-solvents)`
-  The evaporation rate of water and co-solvents directly affects drying speed.
-
-`Additives`
-  Drying agents, coalescing agents, and rheology modifiers can accelerate or delay film formation.
-
-## Quick Start
+### Try it now
 
 ```bash
+git clone https://github.com/sumitguha88/mor
+cd mor
 python3 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev,ui,eval]'
 ```
 
-Validate an ontology:
+Validate the ontology:
 
 ```bash
 mor validate --ontology-root ontology --area paint --version V1
+```
+
+Example output:
+
+```json
+{
+  "valid": true,
+  "errors": 0,
+  "warnings": 0,
+  "issues": []
+}
 ```
 
 Resolve a term:
@@ -384,10 +42,38 @@ Resolve a term:
 mor resolve "latex paint" --ontology-root ontology --area paint --version V1
 ```
 
+Example output:
+
+```json
+{
+  "term": "latex paint",
+  "matched": true,
+  "ambiguous": false,
+  "concept_id": "emulsion-paint",
+  "canonical": "emulsion paint"
+}
+```
+
 Expand a query:
 
 ```bash
 mor expand "epoxy coating formula and raw materials" --ontology-root ontology --area paint --version V1
+```
+
+Example output:
+
+```json
+{
+  "query": "epoxy coating formula and raw materials",
+  "expanded_terms": [
+    "paint formula",
+    "raw material",
+    "resin",
+    "solvent",
+    "additive"
+  ],
+  "explanation": "Expanded query using direct matches, ontology relations, and query hints."
+}
 ```
 
 Generate an answer scaffold:
@@ -399,6 +85,31 @@ mor scaffold \
   --ontology-root ontology \
   --area paint \
   --version V1
+```
+
+Example output:
+
+```json
+{
+  "intent": "architecture_explanation",
+  "sections": [
+    {"id": "definition", "title": "Definition"},
+    {"id": "mechanism", "title": "Mechanism"},
+    {"id": "tradeoffs", "title": "Tradeoffs"},
+    {"id": "comparison", "title": "Comparison"}
+  ]
+}
+```
+
+### Contributor setup
+
+```bash
+git clone https://github.com/sumitguha88/mor
+cd mor
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -e '.[dev,ui,eval]'
+pytest
 ```
 
 Launch the explorer:
@@ -413,13 +124,178 @@ Run the API:
 uvicorn mor.api:app --reload
 ```
 
-Run the MCP server:
+## What MOR Changes
 
-```bash
-mor serve-mcp
+### Without MOR
+
+A prompt-only or vector-only system sees terms like:
+
+- `latex paint`
+- `water-based`
+- `emulsion`
+- `primer`
+- `drying time`
+
+It can retrieve related documents, but it still has to guess:
+
+- whether terms are equivalent
+- which concepts are canonical
+- how concepts relate
+- which linked concepts matter for expansion
+- what a complete answer should include
+
+### With MOR
+
+The runtime can make these semantics explicit:
+
+- resolve `latex paint` -> `emulsion paint`
+- expand `drying time` through linked concepts like `solvent`, `resin`, and `additive`
+- distinguish `paint type` from `paint category`
+- follow typed links like `defined_by`, `contains`, and `supplies`
+- scaffold answers using ontology-driven sections
+
+That means less semantic drift, less prompt guesswork, and better explainability.
+
+## Why MOR
+
+MOR helps when text similarity is not enough.
+
+It is built around a few practical ideas:
+
+- **Canonical concepts**  
+  Synonyms and aliases should resolve to the same domain entity.
+
+- **Typed relationships**  
+  The runtime should know `contains`, `supplied_by`, `defined_by`, and `part_of`, not just “similar to”.
+
+- **Controlled expansion**  
+  Query expansion should come from domain logic, not only embedding proximity.
+
+- **Structured answers**  
+  Domain answers should follow predictable sections and coverage expectations.
+
+- **Explainability**  
+  You should be able to inspect how a query was resolved and why it expanded.
+
+- **Git-native semantic governance**  
+  Your domain model should be versioned, reviewed, and maintained like code.
+
+## Architecture
+
+```text
+User Query
+   ↓
+MOR Runtime
+   ├─ resolve terms
+   ├─ inspect ontology links
+   ├─ expand query
+   └─ build answer scaffold
+   ↓
+LLM / RAG / Agent
 ```
 
-## Authoring Model
+Authoring flow:
+
+```text
+Markdown Concepts
+   ↓
+Structure-aware Parser
+   ↓
+Semantic Model
+   ↓
+Validator
+   ↓
+CLI / API / Explorer / MCP / Eval
+```
+
+## Key Features
+
+### Authoring
+
+- Markdown-native ontology authoring
+- Versioned ontology structures
+- Git-friendly domain modeling
+- Typed relationships and hierarchy support
+- Structure-aware validation
+
+### Runtime
+
+- Canonical term resolution
+- Alias handling and ambiguity detection
+- Query expansion through ontology links
+- Answer scaffolding
+- Related-concept traversal
+- Query interpretation and coverage scoring
+
+### Interfaces
+
+- Typer CLI
+- FastAPI service
+- MCP V1 surface
+- Streamlit ontology explorer
+
+### Evaluation
+
+- Validation reports
+- Benchmark harness
+- Baseline vs ontology-assisted comparisons
+- Langfuse-oriented evaluation workflows
+
+## Flagship Example: Paint Manufacturing
+
+Suppose a user asks:
+
+> Which raw materials most strongly affect drying time in water-based exterior primers?
+
+This is not just a retrieval problem. It is a multi-hop semantic reasoning problem.
+
+A vanilla RAG pipeline may retrieve documents mentioning:
+
+- drying time
+- primer
+- water-based paint
+- additives
+- resins
+
+But the model still has to infer:
+
+- `Dry Time` is a performance attribute
+- `Exterior Primer` is a paint product
+- `Paint Product` is defined by `Paint Formula`
+- `Paint Formula` contains `Raw Material`
+- `Resin`, `Solvent`, and `Additive` are different material classes
+
+MOR makes those links explicit.
+
+### Term resolution
+
+- `water-based` -> `water-based paint`
+- `exterior primer` -> `primer`
+- `raw materials` -> `raw material`
+
+### Relationship-aware expansion
+
+From `drying time`, MOR can expand toward linked concepts such as:
+
+- `resin`
+- `solvent`
+- `additive`
+
+### Better answer structure
+
+Instead of a shallow answer like:
+
+> Drying time in water-based primers is influenced by resins, solvents, and additives.
+
+MOR can drive a more structured answer:
+
+- **Resins (binders)** affect film formation
+- **Solvents** affect evaporation rate
+- **Additives** affect drying behavior and flow
+
+This is the core difference: MOR makes domain semantics explicit before the LLM answers.
+
+## Authoring
 
 MOR ontologies are authored as markdown concept files.
 
@@ -467,9 +343,38 @@ A finished coating item defined by a paint formula, classified by type and usage
 - manufacturing context
 ```
 
-The structure itself is configurable. Different ontology versions can use different schemas via the files under [ontology/structure](ontology/structure).
+Authoring gives you:
 
-## Runtime Surface
+- explicit concepts
+- aliases and synonyms
+- typed links
+- answer requirements
+- versioned structure evolution
+
+Structure versioning:
+
+```text
+ontology/
+  structure/
+    markdown-concept-v1.json
+    markdown-concept-v2.json
+  paint/
+    V1/
+      ontology.json
+      *.md
+```
+
+## Runtime
+
+The runtime turns ontology definitions into behavior:
+
+- resolve user terminology to canonical concepts
+- expand queries through linked concepts
+- inspect relationships and semantic paths
+- scaffold structured answers
+- expose the ontology through CLI, API, explorer, and MCP
+
+## Runtime Surfaces
 
 ### CLI
 
@@ -492,53 +397,150 @@ mor benchmark
 - `POST /scaffold`
 - `GET /stats`
 
-### MCP Server
+### Explorer
+
+Launch the interactive explorer:
+
+```bash
+mor-explorer
+```
+
+## MCP Surface
+
+MOR exposes ontology semantics to agents and MCP-aware tooling.
+
+### Resources
+
+Current MCP V1 resources:
+
+- `ontology://index`
+- `ontology://bundle/{id}`
+- `ontology://concept/{id}`
+
+Planned resource additions:
+
+- `ontology://metadata`
+- `ontology://concept/{id}/links`
+- `ontology://validation/latest`
+
+### Tools
+
+Current MCP V1 tools:
+
+- `resolve_term`
+- `get_concept`
+- `get_related_concepts`
+- `expand_query`
+- `explain_query_resolution`
+- `compute_query_coverage`
+- `build_answer_scaffold`
+- `validate_ontology`
+
+### Prompts
+
+Current MCP V1 prompts:
+
+- `ontology_guided_answer`
+- `concept_comparison`
+
+Planned prompt additions:
+
+- `relationship_path_explanation`
+
+### Why this matters
+
+For agents, MCP is where the ontology stops being passive documentation and becomes an active semantic service.
+
+An agent can:
+
+- resolve ambiguous terms before retrieval
+- inspect concept links before tool selection
+- check ontology coverage before answering
+- build a structured answer plan before synthesis
+
+## MOR vs Alternatives
+
+| Capability | Prompt-only | Vector-only RAG | MOR |
+|---|---|---|---|
+| Canonical term resolution | No | Partial | Yes |
+| Typed relationships | No | No | Yes |
+| Explainable expansion | No | Partial | Yes |
+| Git-native domain model | No | No | Yes |
+| MCP exposure | No | No | Yes |
+| Answer scaffolding | Prompt-dependent | Prompt-dependent | Yes |
+| Semantic governance | Weak | Weak | Strong |
+
+## Good Fit
+
+Use MOR when:
+
+- domain terms are ambiguous or overloaded
+- synonyms and aliases matter
+- relationships between entities matter
+- retrieval needs governed expansion
+- answer structure needs to be consistent
+- ontology should live in Git and be reviewed like code
+- your system needs explainability for query interpretation
+
+Good examples:
+
+- manufacturing
+- supply chain
+- healthcare operations
+- legal and compliance
+- internal enterprise copilots
+- domain-heavy support workflows
+
+## Probably Overkill
+
+MOR may be unnecessary when:
+
+- your use case is a simple FAQ
+- document retrieval alone is sufficient
+- the domain language is already clean and stable
+- you do not need semantic governance
+- you do not plan to maintain ontology content over time
+
+## Explorer
 
 <table>
   <tr>
     <td valign="top" width="52%">
-      <p>MOR exposes an MCP-style surface over the ontology runtime, including resources, tools, and prompts that agents can use to resolve terms, expand queries, inspect concepts, and scaffold answers.</p>
-      <p>The MCP explorer view lets developers inspect the published surface and try the ontology operations interactively from the UI.</p>
+      <p>The explorer makes the ontology visible and inspectable.</p>
+      <p>Use it to browse concepts, inspect relationships, validate graph shape, and understand how MOR sees your domain model.</p>
+      <p>It is useful for ontology authors, developers wiring runtime behavior, and teams debugging expansion and answer structure.</p>
     </td>
     <td valign="top" align="right" width="48%">
-      <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" width="100%" />
+      <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" width="100%" />
     </td>
   </tr>
 </table>
 
-Resources:
-
-- `ontology://index`
-- `ontology://concept/{id}`
-
-Tools:
-
-- `resolve_term`
-- `expand_query`
-- `validate_ontology`
-- `build_answer_scaffold`
-
-Prompts:
-
-- `ontology_guided_architecture_answer`
-- `concept_comparison`
-
 ## Evaluation
 
-MOR includes an evaluation harness for comparing baseline versus ontology-assisted behavior across:
+MOR includes evaluation workflows for measuring whether ontology assistance improves runtime behavior.
+
+What you can measure:
 
 - concept resolution success
 - ontology coverage
 - answer completeness
 - terminology consistency
 
-It also supports Langfuse-backed experiments for LLM evaluation workflows.
+Included support:
 
-Sample eval dataset:
+- validation reports
+- benchmark harness
+- baseline vs ontology-assisted comparisons
+- Langfuse-oriented evaluation flows
 
-- [examples/evals/paint-v2-eval.json](examples/evals/paint-v2-eval.json)
+Example:
 
-Dry-run example:
+```bash
+mor benchmark
+```
+
+Dry-run LLM evaluation:
 
 ```bash
 mor eval-llm \
@@ -551,20 +553,89 @@ mor eval-llm \
   --dry-run
 ```
 
-## Why Developers Like MOR
+## MCP Explorer
 
-- It is plain markdown, not a heavyweight ontology platform.
-- It is Git-native and reviewable.
-- It adds semantic control without forcing a specific model vendor.
-- It works well with agents, RAG, APIs, and MCP clients.
-- It gives you a practical bridge between human domain modeling and LLM runtime behavior.
+<table>
+  <tr>
+    <td valign="top" width="52%">
+      <p>The MCP explorer view shows the published ontology surface in a way that is easy to inspect and demo.</p>
+      <p>It lets developers see what resources, tools, and prompts are available, and provides a simple interface to try ontology operations directly from the UI.</p>
+    </td>
+    <td valign="top" align="right" width="48%">
+      <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" width="100%" />
+    </td>
+  </tr>
+</table>
 
-## Documentation
+## Roadmap
 
-- [docs/architecture.md](docs/architecture.md)
-- [docs/ontology-format.md](docs/ontology-format.md)
-- [ontology/structure/readme.md](ontology/structure/readme.md)
+### Current
+
+- markdown ontology authoring
+- versioned ontology structures
+- validation
+- term resolution
+- query expansion
+- answer scaffolding
+- CLI
+- API
+- explorer
+
+### Next
+
+- richer MCP surface
+- deeper `explain_query_resolution`
+- ontology coverage scoring improvements
+- better bundle and version navigation
+- integrations
+
+## Docs
+
+- [Architecture](docs/architecture.md)
+- [Ontology Format](docs/ontology-format.md)
+- [Structure Guide](ontology/structure/readme.md)
 
 ## Contributing
 
-If you are building domain-aware AI systems and want a lighter-weight alternative to hardcoded prompt logic or opaque retrieval behavior, MOR is designed for exactly that class of problem.
+Contributions are welcome, especially in:
+
+- ontology authoring workflows
+- validation rules
+- runtime reasoning features
+- MCP tooling
+- evaluation workflows
+- domain examples
+
+## License
+
+See [LICENSE](LICENSE).
+
+## Maintainer Notes: GitHub Discoverability
+
+Recommended GitHub metadata:
+
+### Repository description
+
+Git-native ontology runtime for LLMs, agents, and RAG systems. Resolve terms, expand queries, scaffold answers, and expose ontology semantics through CLI, API, explorer, and MCP.
+
+### Suggested topics
+
+- `ontology`
+- `llm`
+- `rag`
+- `ai-agents`
+- `mcp`
+- `semantic-layer`
+- `knowledge-graph`
+- `fastapi`
+- `streamlit`
+- `developer-tools`
+
+### Recommended repo polish
+
+- add CI badge once CI is configured
+- add docs badge once docs are published
+- add license badge
+- add package badge if a package is published later
+- keep screenshots in `docs/images/`
+- add public docs URL when available
