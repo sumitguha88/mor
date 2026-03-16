@@ -9,7 +9,6 @@ from pathlib import Path
 import streamlit as st
 import streamlit.components.v1 as components
 
-from mor.mcp import MORServer
 from mor.registry import list_ontology_areas
 from mor.runtime import OntologyRuntime
 from mor.utils import json_dumps
@@ -47,36 +46,6 @@ def _load_runtime_snapshot(
         "stats": runtime.stats().model_dump(mode="json"),
         "concepts": [concept.model_dump(mode="json") for concept in runtime.model.concepts.values()],
         "graph": graph.model_dump(mode="json"),
-    }
-
-
-@st.cache_data(show_spinner=False)
-def _load_mcp_snapshot(root: str, area: str | None, version: str | None) -> dict[str, object]:
-    server = MORServer(root, area=area, version=version)
-    tools = server.list_tools()
-    prompts = server.list_prompts()
-    resources = server.list_resources()
-    sample_prompt_name = prompts[0]["name"] if prompts else None
-    sample_prompt_args = _sample_prompt_arguments(sample_prompt_name)
-    sample_prompt = (
-        server.get_prompt(sample_prompt_name, sample_prompt_args)
-        if sample_prompt_name and sample_prompt_args is not None
-        else None
-    )
-    sample_tool_name = tools[0]["name"] if tools else None
-    sample_tool_args = _sample_tool_arguments(sample_tool_name)
-    sample_tool_result = (
-        server.call_tool(sample_tool_name, sample_tool_args)
-        if sample_tool_name and sample_tool_args is not None
-        else None
-    )
-    return {
-        "server_info": dict(server.handle_request({"id": 1, "method": "initialize"})["result"]["serverInfo"]),
-        "resources": resources,
-        "tools": tools,
-        "prompts": prompts,
-        "sample_prompt": sample_prompt,
-        "sample_tool_result": sample_tool_result,
     }
 
 
@@ -121,7 +90,6 @@ def run() -> None:
             include_parents,
             include_not_same_as,
         )
-    mcp_snapshot = _load_mcp_snapshot(ontology_root, area_id, version)
 
     concepts = sorted(snapshot["concepts"], key=lambda item: item["canonical"])
     selection = snapshot["selection"] or {}
@@ -139,7 +107,7 @@ def run() -> None:
     metric_columns[3].metric("Hierarchy Edges", stats["hierarchy_edge_count"])
     metric_columns[4].metric("Validation Issues", stats["validation_errors"] + stats["validation_warnings"])
 
-    graph_tab, concepts_tab, data_tab, mcp_tab = st.tabs(["Graph", "Concepts", "Graph Data", "MCP Server"])
+    graph_tab, concepts_tab, data_tab = st.tabs(["Graph", "Concepts", "Graph Data"])
     with graph_tab:
         with st.spinner("Rendering graph..."):
             components.html(
@@ -161,9 +129,6 @@ def run() -> None:
 
     with data_tab:
         st.code(json_dumps(snapshot["graph"]), language="json")
-
-    with mcp_tab:
-        _render_mcp_tab(mcp_snapshot)
 
 
 def _graph_html(
@@ -200,7 +165,8 @@ def _graph_html(
                     "answer_requirements": node["properties"]["answer_requirements"],
                     "source_path": node["properties"]["source_path"],
                     "concept_id": node["properties"]["id"],
-                    "size": max(16, min(34, 10 + int(node.get("value", 1.0) * 1.2))),
+                    "relationship_count": node["properties"].get("relationship_count", int(node.get("value", 1.0))),
+                    "size": max(16, min(44, 16 + int(node.get("value", 1.0) * 1.8))),
                 }
             }
         )
@@ -338,25 +304,6 @@ def _graph_html(
         color: #64748b;
         font-style: italic;
       }}
-      .legend {{
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 8px 12px;
-        margin-top: 14px;
-      }}
-      .legend-item {{
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        color: #334155;
-      }}
-      .dot {{
-        width: 12px;
-        height: 12px;
-        border-radius: 50%;
-        display: inline-block;
-      }}
       .error {{
         border: 1px solid #fecaca;
         background: #fef2f2;
@@ -386,15 +333,6 @@ def _graph_html(
       <div class="panel">
         <div class="eyebrow">Concept Inspector</div>
         <div id="details"></div>
-        <div class="section">
-          <h3>Legend</h3>
-          <div class="legend">
-            <div class="legend-item"><span class="dot" style="background:#0f766e;"></span>Root</div>
-            <div class="legend-item"><span class="dot" style="background:#1d4ed8;"></span>Hub</div>
-            <div class="legend-item"><span class="dot" style="background:#f59e0b;"></span>Concept</div>
-            <div class="legend-item"><span class="dot" style="background:#7c3aed;"></span>Leaf</div>
-          </div>
-        </div>
       </div>
     </div>
     <script>{_asset_text("cytoscape.min.js")}</script>
@@ -430,14 +368,6 @@ def _graph_html(
         details.innerHTML = `
           <h2>Interactive Ontology Graph</h2>
           <div class="body">Click any node to inspect its properties in this panel. Use the zoom controls if labels overlap.</div>
-          <div class="section">
-            <h3>Reading Tips</h3>
-            <ul>
-              <li>Blue arrows represent hierarchy links.</li>
-              <li>Slate lines represent related-concept links.</li>
-              <li>Red dashed lines represent NotSameAs links.</li>
-            </ul>
-          </div>
         `;
       }}
 
@@ -717,76 +647,6 @@ def _render_relationship_section(title: str, relationships: list[dict[str, objec
             st.markdown(f"- `{relationship_type}` -> {target}{suffix}")
     else:
         st.caption("None")
-
-
-def _render_mcp_tab(snapshot: dict[str, object]) -> None:
-    server_info = snapshot["server_info"]
-    resources = snapshot["resources"]
-    tools = snapshot["tools"]
-    prompts = snapshot["prompts"]
-
-    st.markdown("#### Published MCP Surface")
-    st.caption(
-        "This view reflects the actual resources, tools, and prompts exposed by the MOR MCP server "
-        "for the selected ontology area and version."
-    )
-
-    info_columns = st.columns(4)
-    info_columns[0].metric("Server", server_info.get("name", "mor"))
-    info_columns[1].metric("Version", server_info.get("version", "unknown"))
-    info_columns[2].metric("Resources", len(resources))
-    info_columns[3].metric("Tools", len(tools))
-
-    st.markdown("**Resources**")
-    for resource in resources:
-        with st.container(border=True):
-            st.markdown(f"`{resource['uri']}`")
-            st.write(resource["name"])
-            st.caption(resource["description"])
-
-    st.markdown("**Tools**")
-    for tool in tools:
-        with st.container(border=True):
-            st.markdown(f"`{tool['name']}`")
-            st.write(tool["description"])
-            st.code(json_dumps(tool["inputSchema"]), language="json")
-
-    st.markdown("**Prompts**")
-    for prompt in prompts:
-        with st.container(border=True):
-            st.markdown(f"`{prompt['name']}`")
-            st.write(prompt["description"])
-            st.code(json_dumps(prompt.get("arguments", [])), language="json")
-
-    sample_prompt = snapshot.get("sample_prompt")
-    if sample_prompt:
-        st.markdown("**Sample Prompt Payload**")
-        st.code(json_dumps(sample_prompt), language="json")
-
-    sample_tool_result = snapshot.get("sample_tool_result")
-    if sample_tool_result:
-        st.markdown("**Sample Tool Result**")
-        st.code(json_dumps(sample_tool_result), language="json")
-
-
-def _sample_tool_arguments(tool_name: str | None) -> dict[str, object] | None:
-    if tool_name == "resolve_term":
-        return {"term": "raw material"}
-    if tool_name == "expand_query":
-        return {"query": "paint formula and raw material traceability"}
-    if tool_name == "validate_ontology":
-        return {}
-    if tool_name == "build_answer_scaffold":
-        return {"intent": "architecture_explanation", "query": "explain plant and batch relationships"}
-    return None
-
-
-def _sample_prompt_arguments(prompt_name: str | None) -> dict[str, object] | None:
-    if prompt_name == "ontology_guided_architecture_answer":
-        return {"query": "Explain how product formula connects product and raw material."}
-    if prompt_name == "concept_comparison":
-        return {"concept_a": "manufacturing", "concept_b": "supply chain"}
-    return None
 
 
 def _node_title(properties: dict[str, object]) -> str:

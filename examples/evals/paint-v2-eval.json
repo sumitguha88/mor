@@ -2,16 +2,16 @@
   {
     "id": "paint-v2-plant-line-batch",
     "input": {
-      "query": "How do plant, production line, and batch relate in paint manufacturing?",
+      "query": "How do paint, paint product, and paint type relate in the paint ontology?",
       "intent": "architecture_explanation",
-      "area": "paint-manufacturing",
-      "version": "V2"
+      "area": "paint",
+      "version": "V1"
     },
     "expected_output": {
-      "expected_concepts": ["plant", "production line", "batch", "manufacturing", "process"],
+      "expected_concepts": ["paint", "paint product", "paint type"],
       "expected_sections": ["definition", "mechanism", "comparison"],
-      "expected_terms": ["plant", "production line", "batch", "manufactured at", "part of"],
-      "reference_answer": "A plant contains production lines, production lines execute processes, and batches are manufactured at plants and run on lines."
+      "expected_terms": ["paint", "paint product", "paint type", "classifies", "type of"],
+      "reference_answer": "Paint is modeled as a paint product, while paint type classifies variants such as emulsion paint and oil-based paint."
     },
     "metadata": {
       "domain": "paint",
@@ -21,16 +21,16 @@
   {
     "id": "paint-v2-formula-materials",
     "input": {
-      "query": "Explain how a product formula connects to products and raw materials in the V2 paint ontology.",
+      "query": "Explain how paint formula connects to paint product and raw material in the paint ontology.",
       "intent": "architecture_explanation",
-      "area": "paint-manufacturing",
-      "version": "V2"
+      "area": "paint",
+      "version": "V1"
     },
     "expected_output": {
-      "expected_concepts": ["product", "product formula", "raw material", "pigment", "binder", "solvent", "additive"],
+      "expected_concepts": ["paint formula", "paint product", "raw material", "pigment", "resin", "solvent", "additive"],
       "expected_sections": ["definition", "mechanism", "implementation"],
-      "expected_terms": ["has formula", "contains component", "raw material", "product formula"],
-      "reference_answer": "Products are defined by formulas, and formulas contain raw-material components such as pigment, binder, solvent, and additive."
+      "expected_terms": ["paint formula", "paint product", "raw material", "contains"],
+      "reference_answer": "Paint formulas contain raw-material components such as pigment, resin, solvent, and additive, and those formulas define paint products."
     },
     "metadata": {
       "domain": "paint",
@@ -40,16 +40,16 @@
   {
     "id": "paint-v2-supplier-traceability",
     "input": {
-      "query": "How do supplier, shipment, and material lot support raw material traceability?",
+      "query": "How do supplier and raw material relate in the paint ontology?",
       "intent": "implementation_guide",
-      "area": "paint-manufacturing",
-      "version": "V2"
+      "area": "paint",
+      "version": "V1"
     },
     "expected_output": {
-      "expected_concepts": ["supplier", "shipment", "material lot", "raw material", "supply chain", "batch"],
+      "expected_concepts": ["supplier", "raw material supplier", "raw material"],
       "expected_sections": ["definition", "mechanism", "implementation"],
-      "expected_terms": ["supplier", "shipment", "material lot", "supplied by", "delivered in", "consumed in"],
-      "reference_answer": "Suppliers send shipments containing material lots, and those lots tie raw materials to downstream batch consumption for traceability."
+      "expected_terms": ["supplier", "raw material supplier", "raw material", "supplies"],
+      "reference_answer": "Suppliers and raw-material suppliers provide the materials that feed paint formulas and finished paint products."
     },
     "metadata": {
       "domain": "paint",
@@ -59,16 +59,16 @@
   {
     "id": "paint-v2-manufacturing-vs-supply-chain",
     "input": {
-      "query": "Compare manufacturing and supply chain in the paint manufacturing ontology.",
+      "query": "Compare paint type and paint category in the paint ontology.",
       "intent": "concept_comparison",
-      "area": "paint-manufacturing",
-      "version": "V2"
+      "area": "paint",
+      "version": "V1"
     },
     "expected_output": {
-      "expected_concepts": ["manufacturing", "supply chain", "plant", "supplier", "shipment", "raw material"],
+      "expected_concepts": ["paint type", "paint category", "paint product"],
       "expected_sections": ["definition", "similarities", "differences", "tradeoffs"],
-      "expected_terms": ["manufacturing", "supply chain", "plant", "supplier", "shipment"],
-      "reference_answer": "Manufacturing covers internal production execution, while supply chain covers supplier and shipment flows that feed material availability."
+      "expected_terms": ["paint type", "paint category", "paint product", "classifies"],
+      "reference_answer": "Paint type captures formulation or technology families, while paint category groups products by application or market use."
     },
     "metadata": {
       "domain": "paint",
@@ -78,16 +78,16 @@
   {
     "id": "paint-v2-product-category",
     "input": {
-      "query": "What is the role of product category relative to product and product formula?",
+      "query": "What is the role of paint category relative to paint product and paint formula?",
       "intent": "architecture_explanation",
-      "area": "paint-manufacturing",
-      "version": "V2"
+      "area": "paint",
+      "version": "V1"
     },
     "expected_output": {
-      "expected_concepts": ["product category", "product", "product formula"],
+      "expected_concepts": ["paint category", "paint product", "paint formula"],
       "expected_sections": ["definition", "mechanism", "comparison"],
-      "expected_terms": ["categorized as", "classifies", "groups", "product category"],
-      "reference_answer": "Product category classifies products and groups formulas into market or technology families."
+      "expected_terms": ["paint category", "paint product", "paint formula", "classifies"],
+      "reference_answer": "Paint category classifies paint products and helps group related formulas into higher-level application groupings."
     },
     "metadata": {
       "domain": "paint",

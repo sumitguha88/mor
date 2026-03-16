@@ -2,10 +2,10 @@
 
 This folder contains sample datasets for running LLM and ontology-assisted evaluations with MOR.
 
-## Paint V2 sample
+## Paint sample
 
 - Dataset: `examples/evals/paint-v2-eval.json`
-- Default area/version: `paint-manufacturing / V2`
+- Default area/version: `paint / V1`
 
 Each dataset item contains:
 
@@ -23,8 +23,8 @@ Run the evaluation locally without Langfuse using the mock provider:
 mor eval-llm \
   --dataset-path examples/evals/paint-v2-eval.json \
   --ontology-root ontology \
-  --area paint-manufacturing \
-  --version V2 \
+  --area paint \
+  --version V1 \
   --mode ontology_assisted \
   --provider mock \
   --dry-run
@@ -48,8 +48,8 @@ Run an experiment using a live LLM provider:
 mor eval-llm \
   --dataset-path examples/evals/paint-v2-eval.json \
   --ontology-root ontology \
-  --area paint-manufacturing \
-  --version V2 \
+  --area paint \
+  --version V1 \
   --mode ontology_assisted \
   --provider openai \
   --model gpt-4.1-mini

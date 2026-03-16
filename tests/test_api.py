@@ -13,24 +13,24 @@ def test_api_endpoints() -> None:
 
     concepts = client.get("/concepts")
     assert concepts.status_code == 200
-    assert any(item["id"] == "pigment-dispersion" for item in concepts.json())
+    assert any(item["id"] == "emulsion-paint" for item in concepts.json())
 
-    resolve = client.post("/resolve", json={"term": "grind stage"})
+    resolve = client.post("/resolve", json={"term": "latex paint"})
     assert resolve.status_code == 200
-    assert resolve.json()["canonical"] == "pigment dispersion"
+    assert resolve.json()["canonical"] == "emulsion paint"
 
     expand = client.post(
         "/expand",
-        json={"query": "how do we control viscosity in decorative paint production"},
+        json={"query": "paint viscosity control"},
     )
     assert expand.status_code == 200
-    assert "quality control" in expand.json()["expanded_terms"]
+    assert "viscosity" in expand.json()["expanded_terms"]
 
     scaffold = client.post(
         "/scaffold",
         json={
             "intent": "architecture_explanation",
-            "query": "how do we control viscosity in decorative paint production",
+            "query": "paint viscosity control",
         },
     )
     assert scaffold.status_code == 200
@@ -41,10 +41,10 @@ def test_api_endpoints() -> None:
     assert stats.json()["concept_count"] > 0
 
 
-def test_api_can_target_marketing_area() -> None:
-    client = TestClient(create_app(ONTOLOGY_ROOT, area="marketing", version="V1"))
+def test_api_can_target_paint_area() -> None:
+    client = TestClient(create_app(ONTOLOGY_ROOT, area="paint", version="V1"))
 
-    resolve = client.post("/resolve", json={"term": "paid search"})
+    resolve = client.post("/resolve", json={"term": "latex paint"})
 
     assert resolve.status_code == 200
-    assert resolve.json()["canonical"] == "search advertising"
+    assert resolve.json()["canonical"] == "emulsion paint"

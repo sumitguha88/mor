@@ -110,11 +110,11 @@ def upload_eval_dataset(
 ) -> EvalDatasetUploadSummary:
     dataset = load_eval_dataset(dataset_path)
     client = _get_langfuse_client(public_key=public_key, secret_key=secret_key, host=host)
-    dataset_description = description or "Sample MOR evaluation dataset for paint-manufacturing V2."
+    dataset_description = description or "Sample MOR evaluation dataset for paint V1."
     client.create_dataset(
         name=dataset_name,
         description=dataset_description,
-        metadata={"framework": "mor", "area": "paint-manufacturing", "version": "V2"},
+        metadata={"framework": "mor", "area": "paint", "version": "V1"},
         input_schema=_input_schema(),
         expected_output_schema=_expected_output_schema(),
     )

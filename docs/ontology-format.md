@@ -70,15 +70,10 @@ MOR supports versioned ontology areas:
 ontology/
   structure/
     markdown-concept-v1.json
-  paint-manufacturing/
+  paint/
     V1/
       ontology.json
-      pigment-dispersion.md
-      ...
-  marketing/
-    V1/
-      ontology.json
-      campaign-management.md
+      emulsion-paint.md
       ...
 ```
 

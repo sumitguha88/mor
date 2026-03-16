@@ -25,6 +25,7 @@ DEFAULT_INTENT_SECTIONS: Mapping[str, tuple[str, ...]] = {
     "troubleshooting": ("context", "signals", "causes", "actions"),
     "implementation_guide": ("definition", "mechanism", "implementation", "tradeoffs"),
 }
+SCAFFOLD_INTENTS = tuple(DEFAULT_INTENT_SECTIONS.keys())
 
 SECTION_TITLES: Mapping[str, str] = {
     "definition": "Definition",
@@ -73,3 +74,10 @@ MCP_SERVER_INFO = {
     "version": "0.1.0",
 }
 
+MCP_SERVER_INSTRUCTIONS = (
+    "Use resolve_term for ambiguous user terminology before answering. "
+    "Use get_concept after resolution when definitions, aliases, or answer requirements matter. "
+    "Use get_related_concepts or explain_query_resolution to inspect semantic links and interpretation paths. "
+    "Use compute_query_coverage to judge whether MOR has strong ontology support for a query. "
+    "Use build_answer_scaffold before synthesizing domain answers so the response follows ontology-guided structure."
+)

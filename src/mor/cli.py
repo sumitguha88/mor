@@ -28,7 +28,7 @@ def _runtime(ontology_root: Path, area: str | None, version: str | None) -> Onto
 
 
 def _area_option() -> str | None:
-    return typer.Option(None, "--area", help="Ontology area id, such as paint-manufacturing.")
+    return typer.Option(None, "--area", help="Ontology area id, such as paint.")
 
 
 def _version_option() -> str | None:
@@ -83,7 +83,7 @@ def _ensure_structure_layout(ontology_root: Path) -> Path:
 @app.command("init")
 def init_project(
     ontology_root: Path = typer.Option(Path("ontology"), "--ontology-root", help="Ontology directory."),
-    area: str = typer.Option("paint-manufacturing", "--area", help="Ontology area id."),
+    area: str = typer.Option("paint", "--area", help="Ontology area id."),
     version: str = typer.Option("V1", "--version", help="Ontology version folder."),
 ) -> None:
     version_path = _ensure_area_layout(ontology_root, area, version)
@@ -106,7 +106,7 @@ def init_concept(
     except ValueError:
         target_dir = _ensure_area_layout(
             ontology_root,
-            area or "paint-manufacturing",
+            area or "paint",
             version or "V1",
         )
     target_dir.mkdir(parents=True, exist_ok=True)

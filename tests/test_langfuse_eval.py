@@ -16,15 +16,15 @@ def test_load_eval_dataset() -> None:
     items = load_eval_dataset(DATASET_PATH)
 
     assert len(items) == 5
-    assert items[0].input["version"] == "V2"
+    assert items[0].input["version"] == "V1"
     assert "expected_concepts" in items[0].expected_output
 
 
 def test_run_eval_experiment_dry_run() -> None:
     result = run_eval_experiment(
         ontology_root=ONTOLOGY_ROOT,
-        area="paint-manufacturing",
-        version="V2",
+        area="paint",
+        version="V1",
         dataset_path=DATASET_PATH,
         mode="ontology_assisted",
         provider="mock",
@@ -36,7 +36,7 @@ def test_run_eval_experiment_dry_run() -> None:
     assert result.provider == "mock"
     assert len(result.item_results) == 2
     assert any(score.name == "avg_answer_completeness" for score in result.run_evaluations)
-    assert result.item_results[0].output.area == "paint-manufacturing"
+    assert result.item_results[0].output.area == "paint"
 
 
 def test_cli_eval_llm_dry_run() -> None:
@@ -49,9 +49,9 @@ def test_cli_eval_llm_dry_run() -> None:
             "--ontology-root",
             str(ONTOLOGY_ROOT),
             "--area",
-            "paint-manufacturing",
+            "paint",
             "--version",
-            "V2",
+            "V1",
             "--provider",
             "mock",
             "--mode",

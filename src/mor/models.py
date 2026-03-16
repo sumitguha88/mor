@@ -229,10 +229,28 @@ class ConceptSummary(BaseModel):
     parent_count: int
 
 
+class ConceptReference(BaseModel):
+    concept_id: str
+    canonical: str
+    title: str | None = None
+    uri: str | None = None
+
+
+class ConceptLink(BaseModel):
+    relationship_type: str
+    direction: Literal["outgoing", "incoming"]
+    target: ConceptReference
+    inferred: bool = False
+    source_label: str | None = None
+    rationale: str | None = None
+
+
 class ResolveMatch(BaseModel):
     concept_id: str
     canonical: str
     matched_label: str
+    match_type: Literal["canonical", "alias", "alternative"] = "canonical"
+    confidence: float = 1.0
 
 
 class ResolveResponse(BaseModel):
@@ -257,7 +275,77 @@ class ExpandResponse(BaseModel):
     query: str
     matched_concepts: list[ExpansionEvidence]
     expanded_terms: list[str]
+    resolved_concepts: list[ConceptReference] = Field(default_factory=list)
+    suppressed_terms: list[str] = Field(default_factory=list)
     explanation: str
+
+
+class RelationshipPathStep(BaseModel):
+    source: ConceptReference
+    relationship_type: str
+    target: ConceptReference
+    inferred: bool = False
+
+
+class RelationshipPath(BaseModel):
+    source: ConceptReference
+    target: ConceptReference
+    steps: list[RelationshipPathStep]
+    rationale: str
+
+
+class QueryResolutionTrace(BaseModel):
+    term: str
+    concept: ConceptReference
+    matched_label: str
+    match_type: Literal["canonical", "alias"]
+    confidence: float
+
+
+class AmbiguousResolution(BaseModel):
+    term: str
+    matches: list[ResolveMatch]
+    rationale: str
+
+
+class QueryCoverageConcept(BaseModel):
+    concept: ConceptReference
+    matched_terms: list[str] = Field(default_factory=list)
+
+
+class QueryCoverageResponse(BaseModel):
+    query: str
+    covered_concepts: list[QueryCoverageConcept]
+    covered_terms: list[str]
+    unresolved_terms: list[str]
+    suppressed_terms: list[str] = Field(default_factory=list)
+    coverage_score: float
+    explanation: str
+
+
+class QueryResolutionExplanation(BaseModel):
+    query: str
+    detected_terms: list[str]
+    canonical_matches: list[QueryResolutionTrace]
+    alias_matches: list[QueryResolutionTrace]
+    unmatched_terms: list[str]
+    ambiguous_matches: list[AmbiguousResolution]
+    expanded_concepts: list[ExpansionEvidence]
+    relationship_paths: list[RelationshipPath]
+    suppressed_terms: list[str] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+    rationale: str
+
+
+class ScaffoldEvidenceSlot(BaseModel):
+    section_id: str
+    label: str
+    concept_ids: list[str] = Field(default_factory=list)
+
+
+class ScaffoldConstraint(BaseModel):
+    label: str
+    details: str
 
 
 class ScaffoldSection(BaseModel):
@@ -271,6 +359,10 @@ class ScaffoldResponse(BaseModel):
     intent: str
     sections: list[ScaffoldSection]
     concepts: list[str]
+    required_sections: list[str] = Field(default_factory=list)
+    evidence_slots: list[ScaffoldEvidenceSlot] = Field(default_factory=list)
+    constraints: list[ScaffoldConstraint] = Field(default_factory=list)
+    relationship_paths: list[RelationshipPath] = Field(default_factory=list)
     explanation: str
 
 
@@ -282,6 +374,41 @@ class StatsResponse(BaseModel):
     orphan_count: int
     validation_errors: int
     validation_warnings: int
+    validation_valid: bool = True
+    area_id: str | None = None
+    version: str | None = None
+    bundle_id: str | None = None
+    bundle_count: int = 0
+    area_count: int = 0
+    structure_id: str | None = None
+
+
+class RuntimeMetadataResponse(BaseModel):
+    ontology_root: Path
+    area_id: str | None = None
+    version: str | None = None
+    bundle_id: str | None = None
+    metadata: OntologyMetadata | None = None
+    version_metadata: OntologyVersionMetadata | None = None
+    structure: OntologyStructure | None = None
+
+
+class BundleSummary(BaseModel):
+    id: str
+    area_id: str
+    version: str
+    name: str
+    description: str
+    tags: list[str] = Field(default_factory=list)
+    concept_count: int | None = None
+    default: bool = False
+
+
+class BundleDetails(BaseModel):
+    summary: BundleSummary
+    metadata: OntologyMetadata | None = None
+    version_metadata: OntologyVersionMetadata | None = None
+    concepts: list[ConceptSummary] = Field(default_factory=list)
 
 
 class BenchmarkCase(BaseModel):

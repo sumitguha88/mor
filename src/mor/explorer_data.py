@@ -20,6 +20,7 @@ def build_graph_payload(
 ) -> GraphPayload:
     concepts = runtime.model.concepts
     inbound_parents = Counter()
+    node_degree = Counter()
     relation_edges: list[GraphEdge] = []
     seen_edges: set[tuple[str, str, str]] = set()
 
@@ -32,6 +33,7 @@ def build_graph_payload(
                 _append_edge(
                     relation_edges,
                     seen_edges,
+                    node_degree,
                     concept.id,
                     related_id,
                     relation=relationship.relationship_type,
@@ -48,6 +50,7 @@ def build_graph_payload(
                 _append_edge(
                     relation_edges,
                     seen_edges,
+                    node_degree,
                     concept.id,
                     parent_id,
                     relation="parent",
@@ -62,6 +65,7 @@ def build_graph_payload(
                 _append_edge(
                     relation_edges,
                     seen_edges,
+                    node_degree,
                     pair_key[0],
                     pair_key[1],
                     relation="not_same_as",
@@ -107,11 +111,9 @@ def build_graph_payload(
                 "query_hints": concept.query_hints,
                 "answer_requirements": concept.answer_requirements,
                 "source_path": str(concept.source_path),
+                "relationship_count": node_degree[concept.id],
             },
-            value=max(
-                1.0,
-                1.0 + len(concept.relationships) + len(concept.parent_ids) + inbound_parents[concept.id],
-            ),
+            value=max(1.0, float(node_degree[concept.id])),
         )
         for concept in concepts.values()
     ]
@@ -127,6 +129,7 @@ def build_graph_payload(
 def _append_edge(
     edges: list[GraphEdge],
     seen_edges: set[tuple[str, str, str]],
+    node_degree: Counter[str],
     source: str,
     target: str,
     relation: str,
@@ -139,6 +142,8 @@ def _append_edge(
     if key in seen_edges:
         return
     seen_edges.add(key)
+    node_degree[source] += 1
+    node_degree[target] += 1
     edges.append(
         GraphEdge(
             source=source,

@@ -1,0 +1,11 @@
+{
+  "id": "paint",
+  "name": "Paint",
+  "description": "Ontology for paint products, materials, formulas, manufacturing processes, production entities, and supply chain concepts.",
+  "domain": "manufacturing",
+  "version": "V1",
+  "structure": "markdown-concept-v2",
+  "default": false,
+  "is_default_version": true,
+  "tags": ["paint", "coatings", "formula", "manufacturing", "materials"]
+}
