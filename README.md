@@ -5,11 +5,8 @@
 MOR adds a semantic layer between raw user language and your prompts, retrieval pipeline, tool execution, answer scaffolding, MCP publishing, and evaluation.  
 Instead of asking the model to infer domain meaning from text alone, MOR lets you define concepts, aliases, relationships, and answer structure explicitly in versioned markdown.
 
-> Badges to add: `CI` · `License` · `Docs` · `Package`
 
-## Try MOR in 2 Minutes
-
-### Try it now
+## Try MOR 
 
 ```bash
 git clone https://github.com/sumitguha88/mor
@@ -241,7 +238,7 @@ CLI / API / Explorer / MCP / Eval
 - Baseline vs ontology-assisted comparisons
 - Langfuse-oriented evaluation workflows
 
-## Flagship Example: Paint Manufacturing
+## Sample Example: Paint Products
 
 Suppose a user asks:
 
