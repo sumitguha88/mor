@@ -500,22 +500,19 @@ MOR may be unnecessary when:
 
 ## Explorer
 
-<table>
-  <tr>
-    <td valign="top" width="52%">
-      <p>The explorer makes the ontology visible and inspectable.</p>
-      <p>Use it to browse concepts, inspect relationships, validate graph shape, and understand how MOR sees your domain model.</p>
-      <p>It is useful for ontology authors, developers wiring runtime behavior, and teams debugging expansion and answer structure.</p>
-    </td>
-    <td valign="top" align="right" width="48%">
-      <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" width="100%" />
-    </td>
-  </tr>
-</table>
+The explorer makes the ontology visible and inspectable.
+
+Use it to browse concepts, inspect relationships, validate graph shape, and understand how MOR sees your domain model. It is useful for ontology authors, developers wiring runtime behavior, and teams debugging expansion and answer structure.
+
+<p align="center">
+  <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" width="100%" />
+</p>
 
 ## Evaluation
 
 MOR includes evaluation workflows for measuring whether ontology assistance improves runtime behavior.
+
+Evaluation support is still under active development. The current surface is useful for validation, benchmarking, and early ontology-assisted evaluation workflows, but it should still be treated as evolving.
 
 What you can measure:
 
@@ -552,39 +549,13 @@ mor eval-llm \
 
 ## MCP Explorer
 
-<table>
-  <tr>
-    <td valign="top" width="52%">
-      <p>The MCP explorer view shows the published ontology surface in a way that is easy to inspect and demo.</p>
-      <p>It lets developers see what resources, tools, and prompts are available, and provides a simple interface to try ontology operations directly from the UI.</p>
-    </td>
-    <td valign="top" align="right" width="48%">
-      <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" width="100%" />
-    </td>
-  </tr>
-</table>
+The MCP explorer view shows the published ontology surface in a way that is easy to inspect and demo.
 
-## Roadmap
+It lets developers see what resources, tools, and prompts are available, and provides a simple interface to try ontology operations directly from the UI.
 
-### Current
-
-- markdown ontology authoring
-- versioned ontology structures
-- validation
-- term resolution
-- query expansion
-- answer scaffolding
-- CLI
-- API
-- explorer
-
-### Next
-
-- richer MCP surface
-- deeper `explain_query_resolution`
-- ontology coverage scoring improvements
-- better bundle and version navigation
-- integrations
+<p align="center">
+  <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" width="100%" />
+</p>
 
 ## Docs
 
@@ -607,32 +578,7 @@ Contributions are welcome, especially in:
 
 See [LICENSE](LICENSE).
 
-## Maintainer Notes: GitHub Discoverability
-
-Recommended GitHub metadata:
 
 ### Repository description
 
 Git-native ontology runtime for LLMs, agents, and RAG systems. Resolve terms, expand queries, scaffold answers, and expose ontology semantics through CLI, API, explorer, and MCP.
-
-### Suggested topics
-
-- `ontology`
-- `llm`
-- `rag`
-- `ai-agents`
-- `mcp`
-- `semantic-layer`
-- `knowledge-graph`
-- `fastapi`
-- `streamlit`
-- `developer-tools`
-
-### Recommended repo polish
-
-- add CI badge once CI is configured
-- add docs badge once docs are published
-- add license badge
-- add package badge if a package is published later
-- keep screenshots in `docs/images/`
-- add public docs URL when available
