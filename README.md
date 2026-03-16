@@ -1,10 +1,17 @@
 # Markdown Ontology Runtime
 
-MOR is an open-source ontology runtime for LLM applications.
-
-It gives AI agents and RAG systems a semantic layer between raw user language and model prompts, retrieval, and tool execution.
-
-Instead of hoping the model interprets domain language correctly every time, MOR lets you define the domain explicitly in versioned markdown, validate it, and use it at runtime for resolution, expansion, scaffolding, explainability, MCP publishing, and evaluation.
+<table>
+  <tr>
+    <td valign="top">
+      <p><strong>MOR</strong> is an open-source ontology runtime for LLM applications.</p>
+      <p>It gives AI agents and RAG systems a semantic layer between raw user language and model prompts, retrieval, and tool execution.</p>
+      <p>Instead of hoping the model interprets domain language correctly every time, MOR lets you define the domain explicitly in versioned markdown, validate it, and use it at runtime for resolution, expansion, scaffolding, explainability, MCP publishing, and evaluation.</p>
+    </td>
+    <td valign="top" align="right" width="48%">
+      <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" />
+    </td>
+  </tr>
+</table>
 
 ## Why MOR
 
