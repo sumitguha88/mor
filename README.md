@@ -5,6 +5,23 @@
 MOR adds a semantic layer between raw user language and your prompts, retrieval pipeline, tool execution, answer scaffolding, MCP publishing, and evaluation.  
 Instead of asking the model to infer domain meaning from text alone, MOR lets you define concepts, aliases, relationships, and answer structure explicitly in versioned markdown.
 
+## TL;DR
+
+- MOR is a lightweight semantic runtime for LLM applications.
+- It resolves terms, expands queries, links concepts, and scaffolds answers using ontology definitions stored in markdown.
+- The repository ships with a `paint` ontology as a working example, but MOR is designed for any domain.
+- You can use MOR through the CLI, API, explorer, and MCP-style interfaces.
+
+<table>
+  <tr>
+    <td valign="top" width="50%">
+      <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" width="100%" />
+    </td>
+    <td valign="top" width="50%">
+      <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" width="100%" />
+    </td>
+  </tr>
+</table>
 
 ## Try MOR 
 
@@ -15,6 +32,8 @@ python3 -m venv .venv
 source .venv/bin/activate
 pip install -e '.[dev,ui,eval]'
 ```
+
+The bundled `paint` ontology is there to make the framework easy to try. You can model manufacturing, supply chain, healthcare, finance, compliance, or any other domain using the same structure.
 
 Validate the ontology:
 
@@ -155,27 +174,16 @@ That means less semantic drift, less prompt guesswork, and better explainability
 
 ## Why MOR
 
-MOR helps when text similarity is not enough.
+MOR helps when text similarity alone is not enough.
 
-It is built around a few practical ideas:
+It gives you:
 
-- **Canonical concepts**  
-  Synonyms and aliases should resolve to the same domain entity.
-
-- **Typed relationships**  
-  The runtime should know `contains`, `supplied_by`, `defined_by`, and `part_of`, not just “similar to”.
-
-- **Controlled expansion**  
-  Query expansion should come from domain logic, not only embedding proximity.
-
-- **Structured answers**  
-  Domain answers should follow predictable sections and coverage expectations.
-
-- **Explainability**  
-  You should be able to inspect how a query was resolved and why it expanded.
-
-- **Git-native semantic governance**  
-  Your domain model should be versioned, reviewed, and maintained like code.
+- **Canonical concepts** so aliases and synonyms map to the same thing
+- **Typed relationships** so the runtime knows `contains`, `defined_by`, `supplied_by`, and `part_of`
+- **Controlled expansion** so related terms come from ontology logic, not just vector proximity
+- **Structured answers** so the model has a better plan before it writes
+- **Explainability** so you can inspect how a query was interpreted
+- **Git-native governance** so the domain model is versioned and reviewable
 
 ## Architecture
 
@@ -238,7 +246,13 @@ CLI / API / Explorer / MCP / Eval
 - Baseline vs ontology-assisted comparisons
 - Langfuse-oriented evaluation workflows
 
-## Sample Example: Paint Products
+## Example Domain: Paint
+
+The repository currently uses `paint` as the sample ontology because it is easy to understand and rich enough to demonstrate multi-hop domain reasoning.
+
+It is only an example. The same runtime can be extended to any domain.
+
+### Example Query
 
 Suppose a user asks:
 
@@ -360,6 +374,8 @@ ontology/
       ontology.json
       *.md
 ```
+
+You can add more ontology areas the same way. `paint` is just the starter example in this repository.
 
 ## Runtime
 
@@ -502,11 +518,7 @@ MOR may be unnecessary when:
 
 The explorer makes the ontology visible and inspectable.
 
-Use it to browse concepts, inspect relationships, validate graph shape, and understand how MOR sees your domain model. It is useful for ontology authors, developers wiring runtime behavior, and teams debugging expansion and answer structure.
-
-<p align="center">
-  <img src="docs/images/ontology-explorer.png" alt="MOR Ontology Explorer" width="100%" />
-</p>
+Use it to browse concepts, inspect relationships, validate graph shape, and understand how MOR sees your domain model.
 
 ## Evaluation
 
@@ -552,10 +564,6 @@ mor eval-llm \
 The MCP explorer view shows the published ontology surface in a way that is easy to inspect and demo.
 
 It lets developers see what resources, tools, and prompts are available, and provides a simple interface to try ontology operations directly from the UI.
-
-<p align="center">
-  <img src="docs/images/mcp%20explorer.png" alt="MOR MCP Explorer" width="100%" />
-</p>
 
 ## Docs
 
